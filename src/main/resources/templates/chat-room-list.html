@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="/fragment/header.html :: headFragment"></div>
+<body>
+<div id="chat-container" th:each="c : ${chatRooms}">
+    <a id="room" th:name="${c.getRoomId()}" th:href="@{/chat/{roomId}(roomId=${c.getRoomId()})}" th:text="${c.getName()}"></a>
+</div>
+</body>
+<script th:inline="javascript">
+    const roomBtn = document.getElementById("room");
+
+</script>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<div th:replace="/fragment/header.html :: headFragment"></div>
+<body>
+<div class="chat-room-container">
+    <div>
+        <div id="msg-area" class="col"></div>
+        <div class="col-6">
+            <div class="input-group mb-3">
+                <input type="text" id="msg-input" class="form-control" autofocus>
+                <div class="input-group-append">
+                    <button type="button" id="button-send">전송</button>
+                    <button type="button" id="button-out">나가기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+
+    const link = document.location.href.substring("http://localhost:8080/chat/".length);
+    const websocket = new WebSocket("ws://localhost:8080/ws/chat");
+
+    const sendBtn = document.getElementById("button-send");
+    const outBtn = document.getElementById("button-out");
+    const msgArea = document.getElementById("msg-area");
+    const msgInput = document.getElementById("msg-input");
+
+    websocket.onopen = onOpen;
+    websocket.onmessage = onMessage;
+
+    document.addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+            send();
+        }
+    })
+
+    sendBtn.addEventListener("click", (e) => {
+        send();
+    });
+
+    outBtn.addEventListener("click", (e) => {
+        const data = `{
+            "roomId": "${link}",
+            "message": "ccccc"
+        }`;
+        websocket.send(data);
+        websocket.close();
+        location.href = "/";
+    })
+
+    function send() {
+        const data = `{
+            "roomId": "${link}",
+            "message": "${msgInput.value}"
+        }`;
+        websocket.send(data);
+        msgInput.value = "";
+    }
+
+    function onOpen(e) {
+        const data = `{
+            "roomId": "${link}",
+            "message": "입장"
+        }`;
+        websocket.send(data);
+    }
+
+    function onMessage(msg) {
+        const h = document.createElement("div");
+        h.innerText = msg.data;
+        msgArea.appendChild(h);
+    }
+
+</script>
+</html>
